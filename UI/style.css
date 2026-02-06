@@ -1,0 +1,99 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f8ff;
+}
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px;
+  background-color: #2f855a;
+  overflow-x: hidden;
+  transition: width 0.3s ease;
+  color: white;
+  z-index: 1000;
+}
+
+#sidebar>div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background-color: #276749;
+  position: relative;
+  z-index: 1100;
+}
+
+#sidebar.collapsed {
+  width: 70px !important;
+}
+
+#sidebar.collapsed ul li a {
+  display: none;
+}
+
+#sidebar.collapsed>div:first-child img {
+  display: none;
+}
+
+#sidebar.collapsed>div:first-child {
+  justify-content: center !important;
+}
+
+#sidebarToggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1200;
+}
+
+#sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#sidebar ul li {
+  padding: 12px 20px;
+}
+
+#sidebar ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+.main-content {
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+}
+
+.main-content.collapsed {
+  margin-left: 70px !important;
+}
+
+table tbody tr:hover {
+  background-color: #2f855a !important;
+  cursor: pointer;
+}
+
+#gridjs-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 30px;
+  }
+
+  .gridjs-table {
+    min-width: 1000px; /* Makes sure wide table stays inside scroll area */
+  }
+
+  .main-content {
+    overflow-x: hidden; /* Prevents page from growing sideways */
+    padding: 20px;
+  }

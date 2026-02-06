@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="d-flex justify-content-center align-items-start pt-5 bg-light">
+  <div class="container bg-white p-4 rounded shadow" style="max-width: 600px;">
+    <h2 class="mb-4 text-center">Register</h2>
+    <form id="register-form">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone Number</label>
+          <input type="number" class="form-control" id="phone" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Birthdate</label>
+          <input type="date" class="form-control" id="birthdate" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Living Address</label>
+          <input type="text" class="form-control" id="address" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Gender</label>
+          <select class="form-select" id="gender" required>
+            <option value="">Select</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Salary</label>
+          <input type="number" class="form-control" id="salary" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Role ID</label>
+          <input type="number" class="form-control" id="roleId" required />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Marital Status ID</label>
+          <input type="number" class="form-control" id="maritalStatusId" required />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Department ID</label>
+          <input type="number" class="form-control" id="departmentId" />
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <button type="submit" class="btn btn-success px-4">Register</button>
+        <p class="text-danger mt-2" id="errorMsg"></p>
+        <p class="text-success mt-2" id="successMsg"></p>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+    $("#register-form").on("submit", function (e) {
+      e.preventDefault();
+
+      const userData = {
+        Username: $("#username").val().trim(),
+        Password: $("#password").val(),
+        Email: $("#email").val().trim(),
+        Phone_Number: parseFloat($("#phone").val()),
+        Birthdate: $("#birthdate").val(),
+        Living_Address: $("#address").val().trim(),
+        Gender: $("#gender").val(),
+        Salary: parseInt($("#salary").val()),
+        RoleId: parseInt($("#roleId").val()),
+        MaritalStatusId: parseInt($("#maritalStatusId").val()),
+        DepartmentId: parseInt($("#departmentId").val()) || null
+      };
+
+      $.ajax({
+        url: "https://localhost:44360/api/Employee/Register",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(userData),
+        success: function () {
+          $("#successMsg").text("Registration successful!");
+          window.location.href = "index.html";
+          $("#errorMsg").text("");
+          $("#register-form")[0].reset();
+        },
+        error: function (xhr) {
+          const msg = xhr.responseText || "Registration failed. Check inputs.";
+          $("#errorMsg").text(msg);
+          $("#successMsg").text("");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

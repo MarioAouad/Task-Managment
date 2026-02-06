@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Login</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f0f4f8;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 360px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #276749;
+    }
+
+    label {
+      margin-top: 10px;
+      display: block;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      background: #276749;
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #225e3e;
+    }
+
+    .switch-link {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .switch-link a {
+      color: #2b6cb0;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .switch-link a:hover {
+      text-decoration: underline;
+    }
+
+    .error {
+      color: red;
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <form id="login-form">
+      <h2>Login</h2>
+
+      <label for="login-username">Username</label>
+      <input type="text" id="login-username" required />
+
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" required />
+
+      <div class="error" id="login-error"></div>
+
+      <button type="submit">Log In</button>
+
+      <div class="switch-link">
+        Don't have an account?
+        <a href="register.html">Register here</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("login-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const username = document.getElementById("login-username").value.trim();
+      const password = document.getElementById("login-password").value;
+      const loginError = document.getElementById("login-error");
+
+      fetch('https://localhost:44360/api/Employee/Login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Username: username, Password: password })
+      })
+        .then(response => {
+          if (!response.ok) throw new Error('Login failed');
+          return response.json();
+        })
+        .then(data => {
+          if (data.message && data.message.startsWith("Welcome")) {
+            // Success — redirect to index.html
+            window.location.href = "index.html";
+          } else {
+            throw new Error("Invalid login credentials.");
+          }
+        })
+        .catch(error => {
+          loginError.textContent = error.message;
+        });
+    });
+  </script>
+</body>
+
+</html>

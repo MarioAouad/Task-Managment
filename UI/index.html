@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Home</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Font Awesome for icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+  <!-- Grid.js for table functionality -->
+  <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+
+  <!-- Custom stylesheet (optional) -->
+  <link href="style.css" rel="stylesheet" />
+
+  <!-- AJAX URL-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+</head>
+
+<body style="display: flex">
+  <!-- Sidebar iframe -->
+  <iframe src="sidebar.html" style="border: none; width: 220px; height: 100vh" scrolling="no" title="Sidebar"></iframe>
+
+  <!-- Main content container -->
+  <div class="main-content" style="width: -webkit-fill-available; margin-left: 0px !important">
+
+    <!-- Top-right user icon and home button -->
+    <div style="margin-bottom: 20px; display: flex; justify-content: flex-end; align-items: center;">
+      <a href="register.html" title="Register">
+        <i class="fa-regular fa-circle-user fa-2x" style="margin-right: 15px; color: #276749"></i>
+      </a>
+      <a href="login.html" title="Login">
+        <i class="fa-solid fa-house fa-2x" style="color: #276749"></i>
+      </a>
+    </div>
+
+    <hr style="margin: 20px 0; border-color: #ccc" />
+
+    <!-- Search by ID and Add + Reset buttons -->
+    <div class="row" style="margin-bottom: 25px; align-items: center;">
+      <div class="col-4 d-flex">
+        <input type="number" id="searchByIdInput" class="form-control me-2" placeholder="Search by Employee ID"
+          min="1" />
+        <button id="searchByIdBtn" class="btn btn-outline-primary">Search</button>
+      </div>
+      <div class="col-2">
+        <button id="resetGridBtn" class="btn btn-outline-secondary">Reset</button>
+      </div>
+      <div class="col-6 text-end">
+        <button id="openAddModal" class="btn btn-primary" style="background-color: #2f855a">Add</button>
+      </div>
+    </div>
+
+    <!-- Grid.js Table Container -->
+    <div class="row">
+      <div class="col-12">
+        <div id="gridjs-wrapper"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Modal for Add/Edit -->
+  <div class="modal fade" id="addPersonModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addPersonModalLabel">Add Person</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addPersonForm">
+            <div class="mb-3">
+              <label for="personName" class="form-label">Username</label>
+              <input type="text" class="form-control" id="personName" required />
+            </div>
+            <div class="mb-3">
+              <label for="personPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="personPassword" required />
+            </div>
+            <div class="mb-3">
+              <label for="personEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="personEmail" required />
+            </div>
+            <div class="mb-3">
+              <label for="personPhone" class="form-label">Phone Number</label>
+              <input type="number" class="form-control" id="personPhone" required min="1" />
+            </div>
+            <div class="mb-3">
+              <label for="personBirthdate" class="form-label">Birthdate</label>
+              <input type="date" class="form-control" id="personBirthdate" required />
+            </div>
+            <div class="mb-3">
+              <label for="personAddress" class="form-label">Living Address</label>
+              <input type="text" class="form-control" id="personAddress" required />
+            </div>
+            <div class="mb-3">
+              <label for="personGender" class="form-label">Gender</label>
+              <select class="form-select" id="personGender" required>
+                <option value="">Select</option>
+                <option value="M">Male (M)</option>
+                <option value="F">Female (F)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="personSalary" class="form-label">Salary</label>
+              <input type="number" class="form-control" id="personSalary" required min="1" />
+            </div>
+            <div class="mb-3">
+              <label for="personRoleId" class="form-label">Role ID</label>
+              <input type="number" class="form-control" id="personRoleId" required min="1" />
+            </div>
+            <div class="mb-3">
+              <label for="personMaritalStatusId" class="form-label">Marital Status ID</label>
+              <input type="number" class="form-control" id="personMaritalStatusId" required min="1" />
+            </div>
+            <div class="mb-3">
+              <label for="personDepartmentId" class="form-label">Department ID</label>
+              <input type="number" class="form-control" id="personDepartmentId" required min="1" />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" form="addPersonForm" class="btn btn-primary" id="submitAdd">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // Data for the table
+    let gridData = [];
+    const container = document.getElementById("gridjs-wrapper");
+    let grid; // Grid instance
+
+    // Render Grid.js table
+    function renderGrid() {
+      if (grid) grid.destroy();
+
+      grid = new gridjs.Grid({
+        columns: [
+          "ID",
+          "Username",
+          "Email",
+          "RoleId",
+          "Phone Number",
+          "Birthdate",
+          "Living Address",
+          "Gender",
+          "Salary",
+          "MaritalStatusId",
+          "DepartmentId",
+          {
+            name: "Actions",
+            formatter: (_, row) => gridjs.html(`
+  <div class="d-flex gap-2">
+    <button class='btn btn-sm btn-success edit-btn' data-id='${row.cells[0].data}'>Edit</button>
+    <button class='btn btn-sm btn-danger delete-btn' data-id='${row.cells[0].data}'>Delete</button>
+  </div>
+`)
+
+          }
+        ],
+        data: gridData,
+        pagination: { enabled: true, limit: 5 },
+        sort: true,
+        search: false
+      });
+
+      grid.render(container);
+
+      // Attach table event listeners (delegated)
+      setTimeout(() => {
+        const table = container.querySelector("table");
+        if (!table) return;
+        table.removeEventListener("click", tableClickHandler);
+        table.addEventListener("click", tableClickHandler);
+      }, 0);
+    }
+
+    // Handle Edit/Delete button clicks
+    function tableClickHandler(e) {
+      const editBtn = e.target.closest(".edit-btn");
+      const deleteBtn = e.target.closest(".delete-btn");
+
+      // Edit logic
+      if (editBtn) {
+        const id = parseInt(editBtn.dataset.id);
+        const row = gridData.find(r => r[0] === id);
+        if (!row) return;
+
+        document.getElementById("personName").value = row[1];
+        document.getElementById("personEmail").value = row[2]; // email
+        document.getElementById("personSalary").value = row[8]; // salary
+        document.getElementById("submitAdd").textContent = "Update";
+        document.getElementById("submitAdd").setAttribute("data-edit-id", id);
+        addPersonModal.show();
+        return;
+      }
+
+      // Delete logic
+      if (deleteBtn) {
+        const id = parseInt(deleteBtn.dataset.id);
+        if (confirm("Are you sure you want to delete this record?")) {
+          // Call backend to delete
+          $.ajax({
+            url: `https://localhost:44360/api/Employee/Delete/${id}`,
+            method: 'DELETE',
+            success: function () {
+              fetchEmployees();
+            },
+            error: function () {
+              alert('Failed to delete employee.');
+            }
+          });
+        }
+      }
+    }
+
+    // Bootstrap Modal instance
+    const addPersonModal = new bootstrap.Modal(document.getElementById("addPersonModal"));
+
+    // Open modal to add a person
+    document.getElementById("openAddModal").addEventListener("click", () => {
+      document.getElementById("addPersonForm").reset();
+      document.getElementById("submitAdd").textContent = "Add";
+      document.getElementById("submitAdd").removeAttribute("data-edit-id");
+      addPersonModal.show();
+    });
+
+    // Handle form submission
+    document.getElementById("addPersonForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const editId = document.getElementById("submitAdd").getAttribute("data-edit-id");
+
+      const username = document.getElementById("personName").value.trim();
+      const password = document.getElementById("personPassword").value.trim();
+      const email = document.getElementById("personEmail").value.trim();
+      const phone = parseInt(document.getElementById("personPhone").value);
+      const birthdate = document.getElementById("personBirthdate").value;
+      const address = document.getElementById("personAddress").value.trim();
+      const gender = document.getElementById("personGender").value.trim().toUpperCase();
+      const salary = parseInt(document.getElementById("personSalary").value);
+      const roleId = parseInt(document.getElementById("personRoleId").value);
+      const maritalStatusId = parseInt(document.getElementById("personMaritalStatusId").value);
+      const departmentId = parseInt(document.getElementById("personDepartmentId").value);
+
+      const errors = [];
+
+      if (!username || !password || !email || !birthdate || !address || !gender) {
+        errors.push("All fields must be filled.");
+      }
+
+      if (isNaN(phone) || phone <= 0) errors.push("Phone number must be greater than 0.");
+      if (isNaN(salary) || salary <= 0) errors.push("Salary must be greater than 0.");
+      if (isNaN(roleId) || roleId <= 0) errors.push("Role ID must be greater than 0.");
+      if (isNaN(maritalStatusId) || maritalStatusId <= 0) errors.push("Marital Status ID must be greater than 0.");
+      if (isNaN(departmentId) || departmentId <= 0) errors.push("Department ID must be greater than 0.");
+      if (!['M', 'F'].includes(gender)) errors.push("Gender must be 'M' or 'F'.");
+
+      if (errors.length > 0) {
+        alert("Please fix the following errors:\n" + errors.join("\n"));
+        return;
+      }
+
+      const employeeData = {
+        Username: username,
+        Password: password,
+        Email: email,
+        Phone_Number: phone,
+        Birthdate: birthdate,
+        Living_Address: address,
+        Gender: gender,
+        Salary: salary,
+        RoleId: roleId,
+        MaritalStatusId: maritalStatusId,
+        DepartmentId: departmentId
+      };
+
+      const ajaxSettings = {
+        url: editId
+          ? 'https://localhost:44360/api/Employee/Update'
+          : 'https://localhost:44360/api/Employee/Add',
+        method: editId ? "PUT" : "POST",
+        contentType: "application/json",
+        data: JSON.stringify(editId ? { ...employeeData, Id: parseInt(editId) } : employeeData),
+        success: function () {
+          fetchEmployees();
+          document.getElementById("submitAdd").textContent = "Add";
+          document.getElementById("submitAdd").removeAttribute("data-edit-id");
+          addPersonModal.hide();
+        },
+        error: function (xhr) {
+          console.error(xhr.responseText);
+          alert("Failed to " + (editId ? "update" : "add") + " employee.");
+        },
+      };
+
+      $.ajax(ajaxSettings);
+    });
+
+    //fetchEmployees();
+  </script>
+
+  <!-- MainContent collapse script -->
+  <script>
+    window.addEventListener("message", (event) => {
+      const mainContent = document.querySelector(".main-content");
+      const sidebarIframe = document.querySelector("iframe")
+
+      if (event.data.sidebarCollapsed !== undefined) {
+        if (event.data.sidebarCollapsed) {
+          mainContent.classList.add("collapsed");
+          sidebarIframe.style.width = "70px";
+        } else {
+          mainContent.classList.remove("collapsed")
+          sidebarIframe.style.width = "220px";
+        }
+      }
+    });
+  </script>
+
+  <script>
+    function fetchEmployees() {
+      $.ajax({
+        url: 'https://localhost:44360/api/Employee/GetAll', // ✅ Adjust this if needed
+        method: 'GET',
+        success: function (data) {
+          // Transform the data into the format gridjs expects
+          gridData = data.map(emp => [
+            emp.id,
+            emp.username,
+            emp.email,
+            emp.roleId,
+            emp.phone_Number,
+            emp.birthdate,
+            emp.living_Address,
+            emp.gender,
+            emp.salary,
+            emp.maritalStatusId,
+            emp.departmentId
+          ]);
+
+          renderGrid();
+        },
+        error: function (xhr) {
+          console.error(xhr.responseText);
+          alert('Failed to fetch employee data.');
+        }
+      });
+    }
+  </script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      fetchEmployees(); // Load employee data when the page is fully loaded
+    });
+  </script>
+
+  <script>
+    document.getElementById("searchByIdBtn").addEventListener("click", function () {
+      const id = parseInt(document.getElementById("searchByIdInput").value.trim());
+      if (isNaN(id) || id <= 0) {
+        alert("Please enter a valid employee ID.");
+        return;
+      }
+
+      $.ajax({
+        url: `https://localhost:44360/api/Employee/GetSingle/${id}`,
+        method: "GET",
+        success: function (emp) {
+          // Show only this employee in the grid
+          gridData = [[
+            emp.id,
+            emp.username,
+            emp.email,
+            emp.roleId,
+            emp.phone_Number,
+            emp.birthdate,
+            emp.living_Address,
+            emp.gender,
+            emp.salary,
+            emp.maritalStatusId,
+            emp.departmentId
+          ]];
+
+          renderGrid();
+        },
+        error: function () {
+          alert("Employee not found.");
+        }
+      });
+    });
+
+    document.getElementById("resetGridBtn").addEventListener("click", function () {
+      fetchEmployees(); // Reload all employees
+      document.getElementById("searchByIdInput").value = ""; // Clear input
+    });
+  </script>
+
+
+</body>
+
+</html>
